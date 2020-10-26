@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   TextInput,
+  Keyboard
 } from 'react-native';
 import PropTypes from 'prop-types';
 import data from './Countries';
@@ -16,17 +17,17 @@ import data from './Countries';
 export default class IntlPhoneInput extends React.Component {
   constructor(props) {
     super(props);
-    const defaultCountry = data.filter((obj) => obj.code === props.defaultCountry)[0] || data.filter((obj) => obj.code === 'TR')[0];
+    const defaultCountry = data.filter((obj) => obj.code === props.defaultCountry)[0] || data.filter((obj) => obj.code === 'PK')[0];
     this.state = {
       defaultCountry,
       flag: defaultCountry.flag,
       modalVisible: false,
       dialCode: defaultCountry.dialCode,
       phoneNumber: '',
+      masking:defaultCountry.masking,
       mask: defaultCountry.mask,
       countryData: data,
-      selectedCountry:defaultCountry,
-      placeholderTextColor: 'grey'
+      selectedCountry:defaultCountry
     };
   }
 
@@ -75,6 +76,7 @@ export default class IntlPhoneInput extends React.Component {
   hideModal = () => this.setState({ modalVisible: false });
 
   onCountryChange = async (code) => {
+ 
     const countryData = await data;
     try {
       const country = await countryData.filter((obj) => obj.code === code)[0];
@@ -82,6 +84,7 @@ export default class IntlPhoneInput extends React.Component {
         dialCode: country.dialCode,
         flag: country.flag,
         mask: country.mask,
+        masking:country.masking,
         phoneNumber: '',
         selectedCountry:country
       });
@@ -93,6 +96,7 @@ export default class IntlPhoneInput extends React.Component {
         flag: defaultCountry.flag,
         mask: defaultCountry.mask,
         phoneNumber: '',
+        masking:defaultCountry.masking,
         selectedCountry:defaultCountry
       });
     }
@@ -105,9 +109,9 @@ export default class IntlPhoneInput extends React.Component {
     this.setState({ countryData });
   }
 
-  focus() {
-    this.props.inputRef.current.focus();
-  }
+  // focus() {
+  //   this.props.inputRef.current.focus();
+  // }
 
   renderModal=() => {
     if (this.props.customModal) return this.props.customModal(this.state.modalVisible,this.state.countryData,this.onCountryChange);
@@ -122,15 +126,15 @@ export default class IntlPhoneInput extends React.Component {
       filterText,
       searchIconStyle,
       closeButtonStyle,
-      lang,
-      placeholderTextColor
+      lang
     } = this.props;
+    
     return (
       <Modal animationType="slide" transparent={false} visible={this.state.modalVisible}>
         <SafeAreaView style={{ flex: 1 }}>
         <View style={[styles.modalContainer, modalContainer]}>
           <View style={styles.filterInputStyleContainer}>
-            <TextInput autoFocus onChangeText={this.filterCountries} placeholder={filterText || 'Filter'} style={[styles.filterInputStyle, filterInputStyle]} placeholderTextColor={placeholderTextColor }/>
+            <TextInput autoFocus onChangeText={this.filterCountries} placeholder={filterText || 'Filter'} style={[styles.filterInputStyle, filterInputStyle]} />
             <Text style={[styles.searchIconStyle, searchIconStyle]}>🔍</Text>
           </View>
           <FlatList
@@ -177,8 +181,7 @@ renderAction=()=>{
       flagStyle,
       phoneInputStyle,
       dialCodeTextStyle,
-      inputProps,
-      placeholderTextColor
+      inputProps
     } = this.props;
     return (
       <View style={{ ...styles.container, ...containerStyle }}>
@@ -192,13 +195,13 @@ renderAction=()=>{
         <TextInput
           {...inputProps}
           style={[styles.phoneInputStyle, phoneInputStyle]}
-          placeholder={this.props.placeholder || this.state.mask.replace(/9/g, '_')}
+          placeholder={this.props.placeholder || this.state.masking ? this.state.masking : this.state.mask.replace(/9/g, '_')}
+
           autoCorrect={false}
           keyboardType="number-pad"
           secureTextEntry={false}
           value={this.state.phoneNumber}
           onChangeText={this.onChangeText}
-          placeholderTextColor={placeholderTextColor}
         />
         {this.renderAction()}
 
@@ -227,7 +230,6 @@ IntlPhoneInput.propTypes = {
   searchIconStyle: PropTypes.object,
   disableCountryChange: PropTypes.bool,
   inputRef: PropTypes.object,
-  placeholderTextColor: PropTypes.string
 };
 
 const styles = StyleSheet.create({
