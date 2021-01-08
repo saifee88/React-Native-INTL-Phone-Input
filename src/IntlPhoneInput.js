@@ -88,6 +88,9 @@ export default class IntlPhoneInput extends React.Component {
         phoneNumber: '',
         selectedCountry:country
       });
+      if (this.props.onChangeCountry) {
+        this.props.onChangeCountry(country);
+      }
       this.hideModal();
     } catch (err) {
       const defaultCountry = this.state.defaultCountry;
@@ -99,6 +102,9 @@ export default class IntlPhoneInput extends React.Component {
         masking:defaultCountry.masking,
         selectedCountry:defaultCountry
       });
+      if (this.props.onChangeCountry) {
+        this.props.onChangeCountry(defaultCountry);
+      }
     }
   }
 
@@ -217,6 +223,7 @@ IntlPhoneInput.propTypes = {
   defaultCountry: PropTypes.string,
   onChangeText: PropTypes.func,
   customModal: PropTypes.func,
+  onChangeCountry: PropTypes.func,
   phoneInputStyle: PropTypes.object, // {}
   containerStyle: PropTypes.object, // {}
   dialCodeTextStyle: PropTypes.object, // {}
